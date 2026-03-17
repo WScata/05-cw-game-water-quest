@@ -141,3 +141,16 @@ button {
   margin: 30px auto 0;
   transition: background-color 0.2s;
 }
+
+button:disabled {
+  background-color: #9bb59e;
+  cursor: not-allowed;
+}
+
+.achievement {
+  min-height: 28px;
+  margin: 10px 0 20px;
+  text-align: center;
+  font-weight: 700;
+  color: #159A48;
+}

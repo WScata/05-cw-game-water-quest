@@ -1,8 +1,27 @@
 // Game configuration and state variables
-const GOAL_CANS = 25;        // Total items needed to collect
-let currentCans = 0;         // Current number of items collected
-let gameActive = false;      // Tracks if game is currently running
-let spawnInterval;          // Holds the interval for spawning items
+const WIN_SCORE = 20;
+const GAME_DURATION = 30;
+const winningMessages = [
+  'Amazing work! You hit your water goal!',
+  'You won! Every can counts toward clean water!',
+  'Great job! You collected enough cans to win!'
+];
+const losingMessages = [
+  'Nice effort! Try again and go for 20+ cans!',
+  'So close! Give it another shot!',
+  'Keep practicing, you can beat 20 next round!'
+];
+
+let currentCans = 0;
+let timeLeft = GAME_DURATION;
+let gameActive = false;
+let spawnInterval;
+let timerInterval;
+
+const scoreEl = document.getElementById('current-cans');
+const timerEl = document.getElementById('timer');
+const achievementsEl = document.getElementById('achievements');
+const startButton = document.getElementById('start-game');
 
 // Creates the 3x3 game grid where items will appear
 function createGrid() {
@@ -13,6 +32,19 @@ function createGrid() {
     cell.className = 'grid-cell'; // Each cell represents a grid square
     grid.appendChild(cell);
   }
+}
+
+function updateScoreDisplay() {
+  scoreEl.textContent = currentCans;
+}
+
+function updateTimerDisplay() {
+  timerEl.textContent = timeLeft;
+}
+
+function clearBoard() {
+  const cells = document.querySelectorAll('.grid-cell');
+  cells.forEach(cell => (cell.innerHTML = ''));
 }
 
 // Ensure the grid is created when the page loads
@@ -35,20 +67,56 @@ function spawnWaterCan() {
       <div class="water-can"></div>
     </div>
   `;
+
+  const can = randomCell.querySelector('.water-can');
+  can.addEventListener('click', () => {
+    if (!gameActive) return;
+
+    currentCans += 1;
+    updateScoreDisplay();
+    randomCell.innerHTML = '';
+  }, { once: true });
 }
 
 // Initializes and starts a new game
 function startGame() {
-  if (gameActive) return; // Prevent starting a new game if one is already active
+  if (gameActive) return;
+
   gameActive = true;
-  createGrid(); // Set up the game grid
-  spawnInterval = setInterval(spawnWaterCan, 1000); // Spawn water cans every second
+  currentCans = 0;
+  timeLeft = GAME_DURATION;
+  achievementsEl.textContent = '';
+  startButton.disabled = true;
+
+  createGrid();
+  updateScoreDisplay();
+  updateTimerDisplay();
+  spawnWaterCan();
+
+  spawnInterval = setInterval(spawnWaterCan, 1000);
+  timerInterval = setInterval(() => {
+    timeLeft -= 1;
+    updateTimerDisplay();
+
+    if (timeLeft <= 0) {
+      endGame();
+    }
+  }, 1000);
 }
 
 function endGame() {
-  gameActive = false; // Mark the game as inactive
-  clearInterval(spawnInterval); // Stop spawning water cans
+  gameActive = false;
+  clearInterval(spawnInterval);
+  clearInterval(timerInterval);
+  clearBoard();
+
+  const didWin = currentCans >= WIN_SCORE;
+  const messagePool = didWin ? winningMessages : losingMessages;
+  const randomMessage = messagePool[Math.floor(Math.random() * messagePool.length)];
+  achievementsEl.textContent = `Game over! ${randomMessage}`;
+
+  startButton.disabled = false;
 }
 
 // Set up click handler for the start button
-document.getElementById('start-game').addEventListener('click', startGame);
+startButton.addEventListener('click', startGame);
