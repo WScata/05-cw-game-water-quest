@@ -26,17 +26,18 @@ body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 30px;
-  background-color: #f0f0f0;
-  color: #333;
+  background: radial-gradient(circle at top, #FFF7E1 0%, #f9edd0 100%);
+  color: #2d3a40;
 }
 
 .container {
   max-width: 750px;
   margin: 50px auto;
-  background-color: #fff;
+  background-color: #fffdf6;
   padding: 40px;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 14px;
+  border: 3px solid #77A8BB;
+  box-shadow: 0 8px 24px rgba(119, 168, 187, 0.25);
 }
 
 h1 {
@@ -44,7 +45,8 @@ h1 {
   font-size: 30px;
   font-weight: bold;
   margin-bottom: 20px;
-  color: #333;
+  color: #2f6f88;
+  text-shadow: 0 2px 0 #FFF7E1;
 }
 
 h1 img {
@@ -57,22 +59,24 @@ h1 img {
   font-size: 18px;
   margin-bottom: 30px;
   text-align: center;
+  color: #355564;
 }
 
 .stats {
   display: flex;
   justify-content: space-around;
   margin-bottom: 30px;
-  background-color: #f5f5f5;
+  background: linear-gradient(90deg, #77A8BB 0%, #90c0d2 100%);
   padding: 15px 0;
   border-radius: 8px;
+  border: 2px solid #5a90a6;
 }
 
 .stats p {
   margin: 0;
   font-size: 18px;
   font-weight: bold;
-  color: #333;
+  color: #fff;
 }
 
 .game-grid {
@@ -84,7 +88,8 @@ h1 img {
 }
 
 .grid-cell {
-  background-color: #e8e8e8;
+  background-color: #FFF7E1;
+  border: 2px solid #77A8BB;
   border-radius: 8px;
   aspect-ratio: 1;
   display: flex;
@@ -130,8 +135,9 @@ h1 img {
 
 
 button {
-  background-color: #4CAF50;
-  color: white;
+  background-color: #FFC907;
+  color: #224e5f;
+  font-weight: 700;
   border: none;
   padding: 12px 24px;
   font-size: 16px;
@@ -139,12 +145,18 @@ button {
   cursor: pointer;
   display: block;
   margin: 30px auto 0;
-  transition: background-color 0.2s;
+  transition: transform 0.15s, background-color 0.2s;
+}
+
+button:hover {
+  background-color: #ffd73f;
+  transform: translateY(-1px);
 }
 
 button:disabled {
-  background-color: #9bb59e;
+  background-color: #d5c98e;
   cursor: not-allowed;
+  transform: none;
 }
 
 .achievement {
@@ -152,5 +164,9 @@ button:disabled {
   margin: 10px 0 20px;
   text-align: center;
   font-weight: 700;
-  color: #159A48;
+  color: #2f6f88;
+  background-color: #FFF7E1;
+  border: 2px dashed #FFC907;
+  border-radius: 8px;
+  padding: 10px;
 }
