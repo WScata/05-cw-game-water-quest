@@ -4,7 +4,9 @@ const GAME_DURATION = 30;
 const winningMessages = [
   'Amazing work! You hit your water goal!',
   'You won! Every can counts toward clean water!',
-  'Great job! You collected enough cans to win!'
+  'Great job! You collected enough cans to win!',
+  'Nice! You collected enough water!',
+  'Excellent work! All the water you collect makes a difference!'
 ];
 const losingMessages = [
   'Nice effort! Try again and go for 20+ cans!',
@@ -22,6 +24,7 @@ const scoreEl = document.getElementById('current-cans');
 const timerEl = document.getElementById('timer');
 const achievementsEl = document.getElementById('achievements');
 const startButton = document.getElementById('start-game');
+const restartButton = document.getElementById('restart-game');
 
 // Creates the 3x3 game grid where items will appear
 function createGrid() {
@@ -50,6 +53,30 @@ function clearBoard() {
 // Ensure the grid is created when the page loads
 createGrid();
 
+function startRound() {
+  currentCans = 0;
+  timeLeft = GAME_DURATION;
+  achievementsEl.textContent = '';
+
+  clearInterval(spawnInterval);
+  clearInterval(timerInterval);
+
+  createGrid();
+  updateScoreDisplay();
+  updateTimerDisplay();
+  spawnWaterCan();
+
+  spawnInterval = setInterval(spawnWaterCan, 1000);
+  timerInterval = setInterval(() => {
+    timeLeft -= 1;
+    updateTimerDisplay();
+
+    if (timeLeft <= 0) {
+      endGame();
+    }
+  }, 1000);
+}
+
 // Spawns a new item in a random grid cell
 function spawnWaterCan() {
   if (!gameActive) return; // Stop if the game is not active
@@ -74,8 +101,42 @@ function spawnWaterCan() {
 
     currentCans += 1;
     updateScoreDisplay();
-    randomCell.innerHTML = '';
+    can.classList.add('hit-flash');
+    can.style.pointerEvents = 'none';
+
+    setTimeout(() => {
+      if (gameActive) {
+        randomCell.innerHTML = '';
+      }
+    }, 240);
   }, { once: true });
+
+  const emptyCells = Array.from(cells).filter(cell => cell.innerHTML === '');
+  if (emptyCells.length === 0) return;
+
+  const obstacleCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+  obstacleCell.innerHTML = `
+    <div class="water-can-wrapper">
+      <div class="obstacle-icon"></div>
+    </div>
+  `;
+
+  const obstacle = obstacleCell.querySelector('.obstacle-icon');
+  obstacle.addEventListener('click', () => {
+    if (!gameActive) return;
+    if (currentCans === 0) return;
+
+    currentCans = Math.max(0, currentCans - 1);
+    updateScoreDisplay();
+    obstacle.classList.add('hit-flash');
+    obstacle.style.pointerEvents = 'none';
+
+    setTimeout(() => {
+      if (gameActive) {
+        obstacleCell.innerHTML = '';
+      }
+    }, 240);
+  });
 }
 
 // Initializes and starts a new game
@@ -83,25 +144,15 @@ function startGame() {
   if (gameActive) return;
 
   gameActive = true;
-  currentCans = 0;
-  timeLeft = GAME_DURATION;
-  achievementsEl.textContent = '';
   startButton.disabled = true;
+  restartButton.classList.remove('hidden');
 
-  createGrid();
-  updateScoreDisplay();
-  updateTimerDisplay();
-  spawnWaterCan();
+  startRound();
+}
 
-  spawnInterval = setInterval(spawnWaterCan, 1000);
-  timerInterval = setInterval(() => {
-    timeLeft -= 1;
-    updateTimerDisplay();
-
-    if (timeLeft <= 0) {
-      endGame();
-    }
-  }, 1000);
+function restartGame() {
+  if (!gameActive) return;
+  startRound();
 }
 
 function endGame() {
@@ -116,7 +167,9 @@ function endGame() {
   achievementsEl.textContent = `Game over! ${randomMessage}`;
 
   startButton.disabled = false;
+  restartButton.classList.add('hidden');
 }
 
 // Set up click handler for the start button
 startButton.addEventListener('click', startGame);
+restartButton.addEventListener('click', restartGame);
